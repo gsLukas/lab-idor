@@ -5,7 +5,6 @@ import datetime
 app = Flask(__name__)
 app.secret_key = 'segredo-muito-seguro'  # usado para JWT
 
-# Simulação de banco de usuários
 USERS_DB = {
     1: {"id": 1, "username": "lukao", "password": "1234", "email": "lukao@ctf.local", "saldo": 90000},
     2: {"id": 2, "username": "admin", "password": "admin", "email": "admin@ctf.local", "saldo": 999999},
@@ -15,19 +14,14 @@ USERS_DB = {
 
 JWT_SECRET = 'lab-idor-chave'
 
-
-# Página inicial: login ou dashboard
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Dashboard do usuário autenticado
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
 
-
-# Login e geração de token (retorna token e dados do usuário)
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -37,7 +31,7 @@ def login():
                 'user_id': user['id'],
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
             }, JWT_SECRET, algorithm='HS256')
-            # Retorna dados do usuário autenticado (não retorna senha)
+
             return jsonify({
                 "token": token,
                 "user": {
@@ -50,7 +44,7 @@ def login():
     return jsonify({"error": "Credenciais inválidas"}), 401
 
 
-# API profissional: retorna apenas dados do usuário autenticado (mas mantém IDOR na API para fins didáticos)
+
 @app.route('/api/get_profile_data', methods=['GET'])
 def get_profile_data():
     auth = request.headers.get('Authorization')
@@ -63,8 +57,7 @@ def get_profile_data():
         user_id_from_token = decoded['user_id']
     except Exception as e:
         return jsonify({"error": "Token inválido"}), 403
-
-    # IDOR: se o front não enviar user_id, retorna só do próprio usuário
+    
     requested_id = request.args.get("user_id", type=int)
     if requested_id:
         user = USERS_DB.get(requested_id)
@@ -81,23 +74,20 @@ def get_profile_data():
 
 @app.route('/api/get_user_info', methods=['GET'])
 def get_user_info():
-    # Falso positivo: endpoint existe, mas não retorna dados sensíveis
+#fake
     return jsonify({"info": "Endpoint de exemplo. Nenhum dado sensível aqui."})
 
 @app.route('/api/health', methods=['GET'])
 def health():
     return jsonify({"status": "ok"})
 
-# Página institucional: Segurança Digital (IDOR)
 @app.route('/seguranca')
 def seguranca():
     return render_template('seguranca.html')
 
-# Página institucional: Sobre o SafeBank
 @app.route('/sobre')
 def sobre():
     return render_template('sobre.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
-
