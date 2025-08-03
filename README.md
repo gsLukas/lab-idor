@@ -6,7 +6,7 @@ Bem-vindo ao laboratório de IDOR (Insecure Direct Object Reference) do SafeBank
 
 1. **Clone o repositório:**
    ```bash
-   git clone <url-do-repo>
+   git clone https://github.com/gsLukas/lab-idor.git
    cd www
    ```
 2. **Execute o laboratório:**
