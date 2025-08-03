@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>SafeBank - Internet Banking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed; background-size: cover; }
+        .navbar { margin-bottom: 40px; }
+        .main-card { max-width: 500px; margin: 40px auto; background: rgba(255,255,255,0.97); border-radius: 12px; box-shadow: 0 2px 16px #0002; }
+        .token, .profile, .error { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .token { background: #eafaf1; color: #27ae60; }
+        .profile { background: #f0f8ff; color: #2c3e50; }
+        .error { background: #ffeaea; color: #c0392b; }
+        .logo { width: 180px; margin: 0 auto 20px auto; display: block; }
+        .footer { background: #222; color: #fff; text-align: center; padding: 18px 0 10px 0; margin-top: 60px; opacity: 0.95; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SafeBank Logo" width="40" class="me-2">
+          SafeBank
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link active" href="#">Internet Banking</a></li>
+            <li class="nav-item"><a class="nav-link" href="/seguranca">Segurança</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sobre">Sobre</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="card main-card shadow">
+      <div class="card-body">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SafeBank Logo" class="logo">
+        <h2 class="card-title mb-3 text-center">Bem-vindo ao Internet Banking SafeBank</h2>
+        <p class="text-center">Acesse sua conta, consulte seu saldo e explore recursos de segurança digital.</p>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuário</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+        <div id="errorBox" class="error" style="display:none;"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div>SafeBank &copy; 2025 &mdash; Todos os direitos reservados | <a href="#" style="color:#fff;text-decoration:underline;">Política de Privacidade</a></div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.getElementById('loginForm').onsubmit = async function(e) {
+        e.preventDefault();
+        document.getElementById('errorBox').style.display = 'none';
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+            localStorage.setItem('token', data.token);
+            window.location = '/dashboard';
+        } else {
+            document.getElementById('errorBox').innerText = data.error || 'Erro no login';
+            document.getElementById('errorBox').style.display = 'block';
+        }
+    };
+    </script>
+</body>
+</html>
+<!DOCTYPE html>

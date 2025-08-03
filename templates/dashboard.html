@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minha Conta - SafeBank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed; background-size: cover; }
+        .main-card { max-width: 500px; margin: 40px auto; background: rgba(255,255,255,0.97); border-radius: 12px; box-shadow: 0 2px 16px #0002; }
+        .logo { width: 120px; margin: 0 auto 20px auto; display: block; }
+        .footer { background: #222; color: #fff; text-align: center; padding: 18px 0 10px 0; margin-top: 60px; opacity: 0.95; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SafeBank Logo" width="40" class="me-2">
+          SafeBank
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/seguranca">Segurança</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sobre">Sobre</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="card main-card shadow">
+      <div class="card-body text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SafeBank Logo" class="logo mb-2">
+        <div id="avatarBox" class="mb-2"></div>
+        <h2 class="mb-2" id="welcomeMsg">Bem-vindo!</h2>
+        <div id="userBox" class="mb-4"></div>
+        <div id="saldoBox" class="alert alert-success d-flex align-items-center justify-content-center mb-3" style="font-size:1.3em;display:none;">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" width="32" class="me-2" alt="Saldo">
+          <span><b>Saldo:</b> <span id="saldoValue"></span></span>
+        </div>
+        <div class="mb-3">
+          <button class="btn btn-outline-primary w-100 mb-2" onclick="showExtrato()"><i class="bi bi-receipt"></i> Ver Extrato</button>
+        </div>
+        <div id="extratoBox" class="alert alert-info text-start" style="display:none;"></div>
+        <div class="alert alert-secondary text-start mb-3">
+          <b>Resumo de Segurança</b><br>
+          Último acesso: <span id="lastAccess"></span><br>
+          Sua conta está protegida pela <b>LGPD</b> e criptografia de dados.<br>
+        </div>
+        <button class="btn btn-secondary w-100" onclick="logout()">Sair</button>
+      </div>
+    </div>
+    <footer class="footer">
+      <div>SafeBank &copy; 2025 &mdash; Todos os direitos reservados</div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
+    <script>
+    // Busca dados do usuário autenticado
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location = '/';
+    }
+    // Simula último acesso
+    const lastAccess = new Date().toLocaleString('pt-BR');
+    document.getElementById('lastAccess').innerText = lastAccess;
+
+    fetch('/api/get_profile_data', {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.username) {
+            // Avatar
+            document.getElementById('avatarBox').innerHTML = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=0D8ABC&color=fff&size=80" class="rounded-circle shadow">`;
+            // Mensagem personalizada
+            document.getElementById('welcomeMsg').innerText = `Olá, ${data.username}!`;
+            // Dados
+            document.getElementById('userBox').innerHTML =
+                `<div class='mb-2'><b>Email:</b> ${data.email}</div>`;
+            // Saldo
+            document.getElementById('saldoValue').innerText = `R$ ${data.saldo.toLocaleString('pt-BR')}`;
+            document.getElementById('saldoBox').style.display = 'flex';
+        } else {
+            localStorage.removeItem('token');
+            window.location = '/';
+        }
+    });
+
+    function showExtrato() {
+        // Extrato simulado
+        document.getElementById('extratoBox').innerHTML = `
+          <b>Extrato (simulado)</b><br>
+          <ul>
+            <li>01/08/2025 - TED Recebida: +R$ 1.000,00</li>
+            <li>30/07/2025 - Pagamento Conta de Luz: -R$ 120,00</li>
+            <li>28/07/2025 - Compra Supermercado: -R$ 350,00</li>
+            <li>25/07/2025 - Salário: +R$ 5.000,00</li>
+          </ul>
+        `;
+        document.getElementById('extratoBox').style.display = 'block';
+    }
+    function logout() {
+        localStorage.removeItem('token');
+        window.location = '/';
+    }
+    </script>
+</body>
+</html>
